@@ -29,6 +29,9 @@ const MassSendEnhanced = () => {
   const [isPaused, setIsPaused] = useState(false);
   const [estimatedTime, setEstimatedTime] = useState("");
   const [progress, setProgress] = useState({ current: 0, total: 0 });
+  const [autoPauseEnabled, setAutoPauseEnabled] = useState(false);
+  const [autoPauseAfter, setAutoPauseAfter] = useState([30]);
+  const [autoPauseDuration, setAutoPauseDuration] = useState([15]);
   const abortControllerRef = useRef<AbortController | null>(null);
   const { toast } = useToast();
 
@@ -270,7 +273,31 @@ const MassSendEnhanced = () => {
               message: `Сообщение успешно отправлено`,
             });
 
-            // Apply delay
+            // Check for auto-pause
+            if (autoPauseEnabled && currentMessage % autoPauseAfter[0] === 0 && currentMessage < totalMessages) {
+              const autoPauseTime = autoPauseDuration[0] * 60 * 1000; // Convert minutes to ms
+              const pauseEnd = new Date(Date.now() + autoPauseTime);
+              
+              addLog({
+                type: 'pause',
+                message: `Авто-Пауза: отправлено ${autoPauseAfter[0]} сообщений. Отдых ${autoPauseDuration[0]} минут`,
+                pauseEnd,
+              });
+
+              toast({
+                title: "Авто-Пауза",
+                description: `Отправлено ${autoPauseAfter[0]} сообщений. Отдых ${autoPauseDuration[0]} минут`,
+              });
+
+              await new Promise(resolve => setTimeout(resolve, autoPauseTime));
+
+              addLog({
+                type: 'info',
+                message: 'Авто-Пауза завершена. Продолжаем рассылку',
+              });
+            }
+
+            // Apply regular delay
             const delayTime = randomDelay 
               ? (60 + Math.random() * 180) * 1000 // 1-4 minutes
               : delay[0] * 1000;
@@ -413,6 +440,70 @@ const MassSendEnhanced = () => {
               </div>
             )}
           </div>
+
+          {/* Auto-Pause Settings */}
+          <Card className="border-border bg-secondary/20">
+            <CardContent className="p-4 space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <Label htmlFor="auto-pause" className="text-base font-medium cursor-pointer">
+                    Авто-Пауза
+                  </Label>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Автоматическая пауза после N сообщений
+                  </p>
+                </div>
+                <Switch
+                  id="auto-pause"
+                  checked={autoPauseEnabled}
+                  onCheckedChange={setAutoPauseEnabled}
+                  disabled={isSending}
+                />
+              </div>
+
+              {autoPauseEnabled && (
+                <div className="space-y-4 pt-2">
+                  <div className="space-y-2">
+                    <Label className="text-sm">
+                      Пауза после: {autoPauseAfter[0]} сообщений
+                    </Label>
+                    <Slider
+                      value={autoPauseAfter}
+                      onValueChange={setAutoPauseAfter}
+                      min={10}
+                      max={100}
+                      step={5}
+                      className="w-full"
+                      disabled={isSending}
+                    />
+                    <div className="flex justify-between text-xs text-muted-foreground">
+                      <span>10 сообщений</span>
+                      <span>100 сообщений</span>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label className="text-sm">
+                      Длительность паузы: {autoPauseDuration[0]} минут
+                    </Label>
+                    <Slider
+                      value={autoPauseDuration}
+                      onValueChange={setAutoPauseDuration}
+                      min={5}
+                      max={60}
+                      step={5}
+                      className="w-full"
+                      disabled={isSending}
+                    />
+                    <div className="flex justify-between text-xs text-muted-foreground">
+                      <span>5 мин</span>
+                      <span>60 мин</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
 
           {/* Estimated Time */}
           {estimatedTime && (
