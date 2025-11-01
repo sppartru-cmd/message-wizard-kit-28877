@@ -1,5 +1,5 @@
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Send, Users, UserPlus, MessageSquare, BarChart3, Search } from "lucide-react";
+import { Send, Users, UserPlus, MessageSquare, BarChart3, Search, FileText, FolderOpen } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
@@ -13,6 +13,8 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
     if (location.pathname === "/mass-send") return "mass";
     if (location.pathname === "/analytics") return "analytics";
     if (location.pathname === "/check-numbers") return "check";
+    if (location.pathname === "/logs") return "logs";
+    if (location.pathname === "/profile-groups") return "groups";
     return "send";
   };
 
@@ -91,6 +93,28 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
               >
                 <BarChart3 className="mr-2 h-4 w-4" />
                 Аналитика
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
+
+          {/* Third row - 2 buttons */}
+          <Tabs value={getActiveTab()}>
+            <TabsList className="grid w-full grid-cols-2 bg-card border border-border/50 h-12">
+              <TabsTrigger
+                value="groups"
+                onClick={() => navigate("/profile-groups")}
+                className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-[0_0_20px_hsl(280_100%_70%/0.5)] transition-all"
+              >
+                <FolderOpen className="mr-2 h-4 w-4" />
+                Группы профилей
+              </TabsTrigger>
+              <TabsTrigger
+                value="logs"
+                onClick={() => navigate("/logs")}
+                className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-[0_0_20px_hsl(280_100%_70%/0.5)] transition-all"
+              >
+                <FileText className="mr-2 h-4 w-4" />
+                Логи
               </TabsTrigger>
             </TabsList>
           </Tabs>

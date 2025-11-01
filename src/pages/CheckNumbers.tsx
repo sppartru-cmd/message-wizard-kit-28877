@@ -88,10 +88,11 @@ const CheckNumbers = () => {
           variant: "destructive",
         });
       }
-    } catch (error) {
+    } catch (error: any) {
+      console.error('Check numbers error:', error);
       toast({
         title: "Ошибка подключения",
-        description: "Не удалось проверить номера. Проверьте подключение к серверу.",
+        description: error.message || "Не удалось проверить номера. Проверьте подключение к серверу.",
         variant: "destructive",
       });
     } finally {
@@ -108,7 +109,8 @@ const CheckNumbers = () => {
             Проверка номеров WhatsApp
           </CardTitle>
           <CardDescription>
-            Введите номера для проверки их регистрации в WhatsApp (по одному на строку)
+            Введите номера для проверки их регистрации в WhatsApp (по одному на строку).
+            При обнаружении недействительного номера он автоматически добавится в список "Не зарегистрированы".
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">

@@ -167,7 +167,7 @@ const MassSend = () => {
             <Label>Настройка задержки</Label>
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm text-muted-foreground">
-                {randomDelay ? "Случайная задержка (20-60 сек)" : `Задержка: ${delay[0]} сек`}
+                {randomDelay ? "Случайная задержка (1-4 мин)" : `Задержка: ${delay[0]} сек`}
               </span>
               <div className="flex items-center gap-2">
                 <Label htmlFor="random-delay" className="text-sm cursor-pointer">
